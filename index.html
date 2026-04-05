@@ -1,7 +1,146 @@
-import React, { useState } from 'react';
-import { CheckCircle2, XCircle, BookOpen, AlertCircle, ChevronRight, Award } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado ENAMED - Traumas Faciais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animações simples para a interface */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .slide-in-bottom { animation: slideInBottom 0.5s ease-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInBottom {
+            from { opacity: 0; transform: translateY(1rem); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
 
-const questionsData = [
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-blue-300">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">Simulado ENAMED</h1>
+                    <p class="text-blue-200 text-sm">Traumas Faciais</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 bg-blue-800 px-4 py-2 rounded-lg border border-blue-700">
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-blue-300 uppercase font-bold tracking-wider">Respondidas</span>
+                    <span class="font-bold text-lg" id="stat-answered">0 / 25</span>
+                </div>
+                <div class="w-px h-8 bg-blue-700"></div>
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-blue-300 uppercase font-bold tracking-wider">Acertos</span>
+                    <span class="font-bold text-lg text-green-400 flex items-center gap-1">
+                        <span id="stat-score">0</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                            <circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 mt-6">
+        <!-- Navigation & Progress bar -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-slate-500">Progresso do Simulado</span>
+                <span class="text-sm font-bold text-blue-600" id="progress-text">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800" id="q-badge">
+                    Questão 1
+                </span>
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-right" id="q-theme">
+                    Tema
+                </span>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <div class="prose prose-slate max-w-none">
+                    <!-- Text paragraphs -->
+                    <div id="q-text"></div>
+                    
+                    <!-- Table (optional) -->
+                    <div id="q-table-container" class="hidden overflow-x-auto my-6 rounded-lg border border-slate-200">
+                        <table class="min-w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                                <tr id="q-table-headers"></tr>
+                            </thead>
+                            <tbody id="q-table-body" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Question Pivot -->
+                    <p class="font-bold text-slate-900 mt-6 mb-6 text-[17px]" id="q-pivot"></p>
+                </div>
+
+                <!-- Options -->
+                <div class="space-y-3 mt-4" id="q-options"></div>
+
+                <!-- Explanations -->
+                <div id="q-explanation" class="hidden mt-8 p-6 rounded-xl bg-slate-50 border border-slate-200 slide-in-bottom">
+                    <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-blue-600">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+                        </svg>
+                        Gabarito e Justificativa
+                    </h3>
+                    
+                    <div class="mb-6">
+                        <span class="inline-block px-3 py-1 bg-green-100 text-green-800 font-bold rounded-md mb-3" id="exp-correct-letter">
+                            Alternativa Correta: X
+                        </span>
+                        <p class="text-slate-700 leading-relaxed" id="exp-correct-text"></p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-800 mb-2">Por que as outras estão incorretas?</h4>
+                        <div class="space-y-3" id="exp-incorrect-text"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="mt-6 flex justify-between items-center">
+            <button id="btn-prev" onclick="changeQuestion(-1)" class="px-6 py-3 rounded-lg font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                Questão Anterior
+            </button>
+            
+            <button id="btn-next" onclick="changeQuestion(1)" class="px-6 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-sm">
+                Próxima Questão 
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // Dados do Simulado
+        const questionsData = [
   {
     id: 1,
     theme: "TEMA 1: EPIDEMIOLOGIA E AVALIAÇÃO INICIAL DO TRAUMA DE FACE",
@@ -476,219 +615,170 @@ const questionsData = [
   }
 ];
 
-export default function App() {
-  const [answers, setAnswers] = useState({});
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [showExplanation, setShowExplanation] = useState({});
+        // Estado da aplicação
+        let currentQuestionIndex = 0;
+        let answers = {}; // { questionId: 'A'|'B'|'C'|'D' }
 
-  const handleSelectOption = (questionId, letter) => {
-    if (answers[questionId]) return; // impede de trocar depois de responder
-    setAnswers(prev => ({ ...prev, [questionId]: letter }));
-    setShowExplanation(prev => ({ ...prev, [questionId]: true }));
-  };
+        // SVGs Inline para ícones
+        const icons = {
+            check: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-green-500"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
+            x: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-red-500"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`
+        };
 
-  const getScore = () => {
-    let score = 0;
-    Object.keys(answers).forEach(qId => {
-      const q = questionsData.find(q => q.id === parseInt(qId));
-      if (q && answers[qId] === q.correctAnswer) score++;
-    });
-    return score;
-  };
+        // Funções Principais
+        function init() {
+            renderQuestion();
+            updateHeader();
+        }
 
-  const question = questionsData[currentQuestionIndex];
-  const isAnswered = !!answers[question.id];
-  const selectedAnswer = answers[question.id];
+        function getScore() {
+            let score = 0;
+            for (const qId in answers) {
+                const q = questionsData.find(q => q.id == qId);
+                if (q && answers[qId] === q.correctAnswer) score++;
+            }
+            return score;
+        }
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
-      {/* Header */}
-      <header className="bg-blue-900 text-white shadow-md sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-blue-300" />
-            <div>
-              <h1 className="text-xl font-bold leading-tight">Simulado ENAMED</h1>
-              <p className="text-blue-200 text-sm">Traumas Faciais</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 bg-blue-800 px-4 py-2 rounded-lg border border-blue-700">
-            <div className="flex flex-col items-center">
-              <span className="text-xs text-blue-300 uppercase font-bold tracking-wider">Respondidas</span>
-              <span className="font-bold text-lg">{Object.keys(answers).length} / {questionsData.length}</span>
-            </div>
-            <div className="w-px h-8 bg-blue-700"></div>
-            <div className="flex flex-col items-center">
-              <span className="text-xs text-blue-300 uppercase font-bold tracking-wider">Acertos</span>
-              <span className="font-bold text-lg text-green-400 flex items-center gap-1">
-                {getScore()} <Award className="w-4 h-4" />
-              </span>
-            </div>
-          </div>
-        </div>
-      </header>
+        function updateHeader() {
+            const answeredCount = Object.keys(answers).length;
+            const totalCount = questionsData.length;
+            const progress = Math.round((answeredCount / totalCount) * 100);
 
-      <main className="max-w-4xl mx-auto p-4 mt-6">
-        {/* Navigation & Progress bar */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-slate-500">Progresso do Simulado</span>
-            <span className="text-sm font-bold text-blue-600">{Math.round((Object.keys(answers).length / questionsData.length) * 100)}%</span>
-          </div>
-          <div className="w-full bg-slate-200 rounded-full h-2.5">
-            <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style={{ width: `${(Object.keys(answers).length / questionsData.length) * 100}%` }}></div>
-          </div>
-        </div>
+            document.getElementById('stat-answered').textContent = `${answeredCount} / ${totalCount}`;
+            document.getElementById('stat-score').textContent = getScore();
+            
+            document.getElementById('progress-text').textContent = `${progress}%`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
 
-        {/* Question Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="bg-slate-100 px-6 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-              Questão {question.id}
-            </span>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">
-              {question.theme}
-            </span>
-          </div>
+        function renderQuestion() {
+            const q = questionsData[currentQuestionIndex];
+            
+            // Header e Badge
+            document.getElementById('q-badge').textContent = `Questão ${q.id}`;
+            document.getElementById('q-theme').textContent = q.theme;
 
-          <div className="p-6 md:p-8">
-            <div className="prose prose-slate max-w-none">
-              {/* Question Text */}
-              {question.text.map((paragraph, index) => (
-                <p key={index} className="mb-4 text-slate-700 leading-relaxed text-[16px]">
-                  {paragraph}
-                </p>
-              ))}
+            // Textos
+            const textHtml = q.text.map(p => `<p class="mb-4 text-slate-700 leading-relaxed text-[16px]">${p}</p>`).join('');
+            document.getElementById('q-text').innerHTML = textHtml;
 
-              {/* Table rendering if exists */}
-              {question.table && (
-                <div className="overflow-x-auto my-6 rounded-lg border border-slate-200">
-                  <table className="min-w-full text-sm text-left">
-                    <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
-                      <tr>
-                        {question.table.headers.map((header, i) => (
-                          <th key={i} className="px-4 py-3">{header}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {question.table.rows.map((row, i) => (
-                        <tr key={i} className="hover:bg-slate-50/50">
-                          {row.map((cell, j) => (
-                            <td key={j} className="px-4 py-3 text-slate-600">{cell}</td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+            // Tabela
+            const tableContainer = document.getElementById('q-table-container');
+            if (q.table) {
+                tableContainer.classList.remove('hidden');
+                document.getElementById('q-table-headers').innerHTML = q.table.headers.map(h => `<th class="px-4 py-3">${h}</th>`).join('');
+                document.getElementById('q-table-body').innerHTML = q.table.rows.map(row => 
+                    `<tr class="hover:bg-slate-50/50">${row.map(cell => `<td class="px-4 py-3 text-slate-600">${cell}</td>`).join('')}</tr>`
+                ).join('');
+            } else {
+                tableContainer.classList.add('hidden');
+            }
 
-              {/* Question Pivot */}
-              <p className="font-bold text-slate-900 mt-6 mb-6 text-[17px]">
-                {question.question}
-              </p>
-            </div>
+            // Pergunta
+            document.getElementById('q-pivot').textContent = q.question;
 
-            {/* Options */}
-            <div className="space-y-3 mt-4">
-              {question.options.map((option) => {
-                const isSelected = selectedAnswer === option.letter;
-                const isCorrect = question.correctAnswer === option.letter;
+            // Opções
+            renderOptions();
+
+            // Explicação (esconde se ainda não respondeu)
+            renderExplanation();
+
+            // Botões de navegação
+            document.getElementById('btn-prev').disabled = currentQuestionIndex === 0;
+            document.getElementById('btn-next').disabled = currentQuestionIndex === questionsData.length - 1;
+        }
+
+        function renderOptions() {
+            const q = questionsData[currentQuestionIndex];
+            const isAnswered = !!answers[q.id];
+            const selectedLetter = answers[q.id];
+            
+            let optionsHtml = '';
+            
+            q.options.forEach(opt => {
+                const isCorrect = q.correctAnswer === opt.letter;
+                const isSelected = selectedLetter === opt.letter;
                 
-                let optionClasses = "relative flex items-start p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ";
-                
+                let containerClasses = "relative flex items-start p-4 rounded-xl border-2 transition-all duration-200 ";
+                let badgeClasses = "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-4 ";
+                let iconHtml = '';
+
                 if (!isAnswered) {
-                  optionClasses += "border-slate-200 hover:border-blue-400 hover:bg-blue-50";
+                    containerClasses += "border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer";
+                    badgeClasses += "bg-slate-100 text-slate-600 border border-slate-300";
                 } else {
-                  if (isCorrect) {
-                    optionClasses += "border-green-500 bg-green-50/50";
-                  } else if (isSelected && !isCorrect) {
-                    optionClasses += "border-red-400 bg-red-50/50";
-                  } else {
-                    optionClasses += "border-slate-200 opacity-50 cursor-not-allowed";
-                  }
+                    if (isCorrect) {
+                        containerClasses += "border-green-500 bg-green-50/50";
+                        badgeClasses += "bg-green-500 text-white";
+                        iconHtml = icons.check;
+                    } else if (isSelected && !isCorrect) {
+                        containerClasses += "border-red-400 bg-red-50/50";
+                        badgeClasses += "bg-red-500 text-white";
+                        iconHtml = icons.x;
+                    } else {
+                        containerClasses += "border-slate-200 opacity-50 cursor-not-allowed";
+                        badgeClasses += "bg-slate-200 text-slate-500";
+                    }
                 }
 
-                return (
-                  <div 
-                    key={option.letter}
-                    className={optionClasses}
-                    onClick={() => handleSelectOption(question.id, option.letter)}
-                  >
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-4 ${
-                      isAnswered 
-                        ? (isCorrect ? 'bg-green-500 text-white' : (isSelected ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-500'))
-                        : 'bg-slate-100 text-slate-600 border border-slate-300'
-                    }`}>
-                      {option.letter}
+                optionsHtml += `
+                    <div class="${containerClasses}" onclick="selectOption('${opt.letter}')">
+                        <div class="${badgeClasses}">${opt.letter}</div>
+                        <div class="flex-1 mt-1 text-slate-700 leading-snug">${opt.text}</div>
+                        ${iconHtml}
                     </div>
-                    <div className="flex-1 mt-1 text-slate-700 leading-snug">
-                      {option.text}
-                    </div>
-                    {isAnswered && isCorrect && (
-                      <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-green-500" />
-                    )}
-                    {isAnswered && isSelected && !isCorrect && (
-                      <XCircle className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-red-500" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                `;
+            });
 
-            {/* Explanations (Gabarito e Justificativas) */}
-            {showExplanation[question.id] && (
-              <div className="mt-8 p-6 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h3 className="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200">
-                  <AlertCircle className="w-5 h-5 text-blue-600" />
-                  Gabarito e Justificativa
-                </h3>
+            document.getElementById('q-options').innerHTML = optionsHtml;
+        }
+
+        function renderExplanation() {
+            const q = questionsData[currentQuestionIndex];
+            const expContainer = document.getElementById('q-explanation');
+            const isAnswered = !!answers[q.id];
+
+            if (isAnswered) {
+                document.getElementById('exp-correct-letter').textContent = `Alternativa Correta: ${q.correctAnswer}`;
+                document.getElementById('exp-correct-text').textContent = q.justificationCorrect;
                 
-                <div className="mb-6">
-                  <span className="inline-block px-3 py-1 bg-green-100 text-green-800 font-bold rounded-md mb-3">
-                    Alternativa Correta: {question.correctAnswer}
-                  </span>
-                  <p className="text-slate-700 leading-relaxed">
-                    {question.justificationCorrect}
-                  </p>
-                </div>
+                const incorrectHtml = q.justificationIncorrect.split('\n').map(line => {
+                    const prefix = line.substring(0, 3);
+                    const rest = line.substring(3);
+                    return `<p class="text-slate-600 text-sm leading-relaxed p-3 bg-white rounded border border-slate-100">
+                        <span class="font-bold text-red-500 mr-1">${prefix}</span>${rest}
+                    </p>`;
+                }).join('');
+                document.getElementById('exp-incorrect-text').innerHTML = incorrectHtml;
+                
+                expContainer.classList.remove('hidden');
+            } else {
+                expContainer.classList.add('hidden');
+            }
+        }
 
-                <div>
-                  <h4 className="font-bold text-slate-800 mb-2">Por que as outras estão incorretas?</h4>
-                  <div className="space-y-3">
-                    {question.justificationIncorrect.split('\n').map((line, idx) => (
-                      <p key={idx} className="text-slate-600 text-sm leading-relaxed p-3 bg-white rounded border border-slate-100">
-                        <span className="font-bold text-red-500 mr-1">{line.substring(0, 3)}</span>
-                        {line.substring(3)}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        function selectOption(letter) {
+            const q = questionsData[currentQuestionIndex];
+            if (answers[q.id]) return; // Já respondeu
 
-        {/* Footer Navigation */}
-        <div className="mt-6 flex justify-between items-center">
-          <button
-            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-            disabled={currentQuestionIndex === 0}
-            className="px-6 py-3 rounded-lg font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Questão Anterior
-          </button>
-          
-          <button
-            onClick={() => setCurrentQuestionIndex(prev => Math.min(questionsData.length - 1, prev + 1))}
-            disabled={currentQuestionIndex === questionsData.length - 1}
-            className="px-6 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-sm"
-          >
-            Próxima Questão <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </main>
-    </div>
-  );
-}
+            answers[q.id] = letter;
+            renderOptions();
+            renderExplanation();
+            updateHeader();
+        }
+
+        function changeQuestion(direction) {
+            const newIndex = currentQuestionIndex + direction;
+            if (newIndex >= 0 && newIndex < questionsData.length) {
+                currentQuestionIndex = newIndex;
+                renderQuestion();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Inicializar a aplicação ao carregar
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

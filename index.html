@@ -1,0 +1,694 @@
+import React, { useState } from 'react';
+import { CheckCircle2, XCircle, BookOpen, AlertCircle, ChevronRight, Award } from 'lucide-react';
+
+const questionsData = [
+  {
+    id: 1,
+    theme: "TEMA 1: EPIDEMIOLOGIA E AVALIAÇÃO INICIAL DO TRAUMA DE FACE",
+    text: [
+      "Homem de 24 anos, entregador de aplicativo, é trazido ao pronto-socorro pelo SAMU após colisão moto x anteparo fixo em alta velocidade. Encontrava-se com capacete aberto no momento do impacto.",
+      "Exame físico: estado geral grave, colar cervical posicionado. PA 90 x 60 mmHg, FC 122 bpm, FR 28 irpm, Tax 36,2 °C, SpO2 88% em ar ambiente. Escala de Coma de Glasgow = 12. Apresenta grave trauma panfacial com afundamento do terço médio da face, sangramento ativo intenso na cavidade oral e via aérea parcialmente obstruída por coágulos e fragmentos dentários. Restante do exame segmentar sem alterações evidentes.",
+      "A equipe de cirurgia plástica/bucomaxilofacial do hospital é acionada pela enfermagem devido à deformidade facial."
+    ],
+    question: "O próximo passo na condução desse caso é:",
+    options: [
+      { letter: "A", text: "aguardar a avaliação da equipe de cirurgia plástica antes de qualquer manipulação, devido ao risco de agravamento das fraturas maxilares." },
+      { letter: "B", text: "realizar intubação orotraqueal imediata e controle do sangramento, priorizando a permeabilidade da via aérea e o combate ao choque." },
+      { letter: "C", text: "solicitar tomografia computadorizada de crânio e face com reconstrução 3D para planejamento cirúrgico antes da abordagem da via aérea." },
+      { letter: "D", text: "iniciar a fixação maxilomandibular temporária na sala de emergência para estancar o sangramento proveniente da fratura Le Fort." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "O cirurgião plástico/especialista facial só deve atuar após o afastamento de possíveis lesões com risco de morte. Em um paciente com trauma facial grave, há alto risco de obstrução de vias aéreas (letra A do mnemônico XABCDE) e choque hemorrágico (letra C). A conduta adequada e prioritária é garantir a via aérea avançada (intubação) e o controle hemodinâmico.",
+    justificationIncorrect: "(A) Incorreta, pois a avaliação de especialistas secundários nunca deve atrasar o manejo de condições que ameaçam a vida (via aérea e choque).\n(C) Incorreta, pois o paciente está instável (hipotenso, taquicárdico, hipoxêmico e rebaixado). Pacientes instáveis não devem ser transportados para a tomografia antes da estabilização (XABCDE).\n(D) Incorreta, pois procedimentos definitivos de fixação óssea não fazem parte da abordagem primária de reanimação, e a manipulação com fixação sem proteção da via aérea em paciente rebaixado agravaria o risco de broncoaspiração."
+  },
+  {
+    id: 2,
+    theme: "TEMA 1: EPIDEMIOLOGIA E AVALIAÇÃO INICIAL DO TRAUMA DE FACE",
+    text: [
+      "Mulher de 28 anos, dona de casa, é atendida na Unidade de Pronto Atendimento (UPA) referindo ter sofrido queda da própria altura há 2 horas. Apresenta-se ansiosa e chorosa.",
+      "Exame físico: PA 120 x 80 mmHg, FC 88 bpm, FR 16 irpm, Tax 36,5 °C. Equimose periorbitária bilateral e sangramento pelo canal auditivo externo direito (otorragia). Ao ser inspecionado, o residente de plantão observa que a secreção que escorre pelo ouvido da paciente está gotejando no lençol da maca, formando uma mancha com um centro avermelhado circundado por um halo mais claro."
+    ],
+    table: {
+      headers: ["Exame", "Resultado", "Valor de referência"],
+      rows: [
+        ["Glicemia capilar", "110", "70 a 99 mg/dL"],
+        ["Hemoglobina", "13,2", "12,0 a 15,5 g/dL"],
+        ["Beta-2 transferrina da secreção", "Positiva", "Negativa"]
+      ]
+    },
+    question: "A principal hipótese diagnóstica é:",
+    options: [
+      { letter: "A", text: "fratura isolada de ossos nasais com deslocamento posterior." },
+      { letter: "B", text: "laceração traumática do meato acústico externo sem lesão óssea." },
+      { letter: "C", text: "fístula liquórica por fratura de base de crânio." },
+      { letter: "D", text: "luxação condilar da mandíbula com compressão timpânica." }
+    ],
+    correctAnswer: "C",
+    justificationCorrect: "A apresentação de equimose periorbitária bilateral (sinal do guaxinim), associada a otorragia com o clássico \"sinal do halo\" ou \"duplo anel\" (sangue no centro e líquor na periferia) indica fortemente a presença de fístula liquórica, típica das fraturas de base de crânio. O líquor não coagula e a presença da proteína beta-2 transferrina é o padrão-ouro laboratorial para confirmar a origem liquórica do fluido.",
+    justificationIncorrect: "(A) Incorreta. Fraturas nasais apresentam epistaxe e deformidade local, mas não causam otorragia com sinal do halo nem positividade para beta-2 transferrina na orelha.\n(B) Incorreta. Uma laceração do meato acústico sangra, mas o sangue coagula normalmente e não forma o sinal do duplo anel, tampouco apresenta beta-2 transferrina (que é exclusiva do LCR).\n(D) Incorreta. A luxação condilar pode gerar sangramento no canal auditivo (fratura da parede anterior do conduto), mas não gera fístula liquórica."
+  },
+  {
+    id: 3,
+    theme: "TEMA 1: EPIDEMIOLOGIA E AVALIAÇÃO INICIAL DO TRAUMA DE FACE",
+    text: [
+      "Homem de 32 anos é atendido na sala de emergência de um hospital terciário após acidente automobilístico severo. Segundo os dados da literatura médica sobre a epidemiologia dos traumas de face apresentados no caso, a equipe deve manter um elevado índice de suspeição para lesões concomitantes.",
+      "Exame físico: PA 110 x 70 mmHg, FC 90 bpm, FR 18 irpm, Tax 36,4 °C. Trauma facial significativo envolvendo disjunção craniofacial. Sem déficits motores aparentes nos membros."
+    ],
+    question: "É correto afirmar que:",
+    options: [
+      { letter: "A", text: "as fraturas faciais funcionam como \"amortecedores\", reduzindo a incidência de lesões cerebrais associadas a quase zero." },
+      { letter: "B", text: "a morbimortalidade do trauma facial isolado atinge predominantemente a população idosa e infantil." },
+      { letter: "C", text: "aproximadamente 60% dos pacientes com trauma facial grave apresentam risco de obstrução de vias aéreas e lesões associadas." },
+      { letter: "D", text: "lesões na coluna cervical ocorrem em mais de 50% dos casos, devendo-se indicar cirurgia ortopédica imediata para todos." }
+    ],
+    correctAnswer: "C",
+    justificationCorrect: "Conforme os dados epidemiológicos clássicos, 60% dos pacientes com trauma facial grave apresentam lesões associadas e risco significativo de obstrução de vias aéreas. A grande quantidade de lesões se deve à enorme exposição e pouca proteção da região.",
+    justificationIncorrect: "(A) Incorreta. Há associação com 20 a 50% de lesões cerebrais concomitantes em grandes traumas de face. O esqueleto facial não anula o trauma encefálico.\n(B) Incorreta. A maior morbimortalidade ocorre em adultos jovens, que são as vítimas mais frequentes de acidentes automobilísticos, violência interpessoal e esportes de contato.\n(D) Incorreta. A incidência de lesões de coluna cervical associadas ao trauma de face varia de 1% a 4%, e não 50%, e a indicação cirúrgica depende do tipo da lesão espinhal, não sendo imediata para \"todos\"."
+  },
+  {
+    id: 4,
+    theme: "TEMA 1: EPIDEMIOLOGIA E AVALIAÇÃO INICIAL DO TRAUMA DE FACE",
+    text: [
+      "Mulher de 35 anos passa em consulta não agendada na Unidade Básica de Saúde (UBS). Relata que \"esbarrou em uma porta no escuro\" há um dia.",
+      "Exame físico: PA 120 x 75 mmHg, FC 78 bpm. A paciente evita contato visual direto. Nota-se edema em hemiface direita e equimose periorbitária em regressão. Presença de dor à palpação do arco zigomático. O médico de família e comunidade nota inconsistências na história da paciente em relação à cinemática do trauma."
+    ],
+    question: "A conduta adequada a ser adotada na assistência é:",
+    options: [
+      { letter: "A", text: "prescrever analgésicos e orientar compressa fria no local, respeitando o direito da paciente de não revelar o motivo real do trauma." },
+      { letter: "B", text: "investigar ativamente e de forma acolhedora a possibilidade de violência doméstica, visto que 25% das mulheres com trauma facial são vítimas desse agravo." },
+      { letter: "C", text: "encaminhar a paciente diretamente para a delegacia da mulher antes de solicitar exames radiológicos, para garantir a produção de provas físicas." },
+      { letter: "D", text: "confrontar a paciente com a verdade, informando que a lesão zigomática é anatomicamente impossível de ser causada por uma porta." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "Cerca de 25% das mulheres que apresentam trauma facial são vítimas de violência doméstica. Diante de lesões incompatíveis com a história relatada e comportamento de evitação, o médico de família deve suspeitar de violência por parceiro íntimo e usar uma abordagem acolhedora e investigativa (sem pré-julgamentos) para oferecer a rede de apoio e proteção adequada.",
+    justificationIncorrect: "(A) Incorreta. Ignorar ativamente o contexto psicossocial e as inconsistências em casos suspeitos de violência doméstica caracteriza omissão médica no nível primário de saúde.\n(C) Incorreta. O cuidado em saúde e a avaliação clínica/radiológica (atendimento médico) não devem ser condicionados à ida prévia a uma delegacia. A prioridade é a saúde e o acolhimento.\n(D) Incorreta. A abordagem deve ser empática e acolhedora. \"Confrontar\" a paciente gera quebra do vínculo, retraimento e perda da oportunidade de ajudar a vítima no ciclo de violência."
+  },
+  {
+    id: 5,
+    theme: "TEMA 1: EPIDEMIOLOGIA E AVALIAÇÃO INICIAL DO TRAUMA DE FACE",
+    text: [
+      "Homem de 40 anos chega ao pronto-socorro referindo agressão física por terceiros (socos) há 3 horas. Apresenta-se clinicamente estável.",
+      "Exame físico: PA 130 x 85 mmHg, FC 80 bpm, FR 16 irpm. Mínimas escoriações em região frontal e zigomática esquerda, com leve edema localizado. O paciente refere pequena alteração na mordida, mas a abertura bucal é preservada."
+    ],
+    question: "O exame complementar de maior acurácia para estabelecer o diagnóstico estrutural neste caso é:",
+    options: [
+      { letter: "A", text: "radiografia simples de face nas incidências de Waters e Caldwell." },
+      { letter: "B", text: "ressonância magnética do crânio com foco em tecidos moles e partes moles orbitárias." },
+      { letter: "C", text: "tomografia computadorizada (TC) de crânio e face, preferencialmente com reconstrução 3D." },
+      { letter: "D", text: "ultrassonografia facial à beira leito (POCUS) para avaliar degraus ósseos." }
+    ],
+    correctAnswer: "C",
+    justificationCorrect: "O exame completo da face e exames de imagem são indicados mesmo quando há pequenas feridas ou abrasões, pois essas podem ser os sinais mais aparentes de uma fratura subjacente (neste caso, sugerido pela alteração na mordida). A avaliação radiográfica de eleição e padrão-ouro para o trauma facial é a TC de crânio e face, preferencialmente com reconstrução 3D.",
+    justificationIncorrect: "(A) Incorreta. Embora as radiografias simples tenham sido amplamente utilizadas no passado, elas apresentam sobreposição de estruturas e baixa sensibilidade comparadas à TC, que é o exame de escolha inicial.\n(B) Incorreta. A ressonância magnética não é o exame inicial para trauma agudo ósseo (esqueleto facial), sendo inferior à TC para delineamento de fraturas corticais, além de demorada.\n(D) Incorreta. O ultrassom tem aplicação extremamente limitada no diagnóstico das fraturas faciais e não substitui a TC na avaliação do esqueleto maxilofacial e base de crânio."
+  },
+  {
+    id: 6,
+    theme: "TEMA 2: EXAME FÍSICO ESPECÍFICO E URGÊNCIAS FACIAIS",
+    text: [
+      "Menino de 9 anos é levado à UBS pela mãe após ter sofrido uma joelhada no rosto durante partida de futebol na escola há 1 hora. Queixa-se de nariz \"entupido\" e dor local constante.",
+      "Exame físico: sinais vitais normais. Presença de leve edema de pirâmide nasal sem deformidade grosseira. À rinoscopia anterior bilateral, observa-se uma massa avermelhada, flutuante e de aspecto vinhoso no septo nasal, ocluindo parcialmente as fossas nasais. O abaixamento dessa estrutura com cotonete não reduz o abaulamento."
+    ],
+    question: "Quais são, respectivamente, o diagnóstico e a conduta mais adequada?",
+    options: [
+      { letter: "A", text: "Pólipo nasal traumático; prescrição de corticosteroide tópico e reavaliação em 7 dias." },
+      { letter: "B", text: "Fratura isolada dos ossos nasais; encaminhamento para cirurgia de rinoplastia após 6 meses." },
+      { letter: "C", text: "Hematoma submucoso de septo; drenagem cirúrgica imediata." },
+      { letter: "D", text: "Epistaxe posterior; tamponamento nasal anterior e posterior com balão de Foley." }
+    ],
+    correctAnswer: "C",
+    justificationCorrect: "O caso descreve um hematoma septal (coleção de sangue entre o pericôndrio e a cartilagem do septo). A conduta adequada e imperativa é a drenagem imediata. A manutenção do hematoma priva a cartilagem de sua nutrição (proveniente do pericôndrio), podendo causar isquemia, necrose e subsequente condrólise (destruição da cartilagem), resultando na deformidade crônica em \"nariz de sela\".",
+    justificationIncorrect: "(A) Incorreta. Pólipos nasais não são formações agudas pós-traumáticas; seu tratamento envolve corticoide, mas a hipótese clínica é incorreta.\n(B) Incorreta. Embora possa haver fratura, o achado de massa flutuante exige alívio imediato (drenagem) independentemente de correção tardia de desvios ósseos.\n(D) Incorreta. Não há relato de sangramento ativo exteriorizado (epistaxe), mas sim de uma coleção contida (hematoma) que oclui as fossas nasais. O tamponamento não drena o hematoma."
+  },
+  {
+    id: 7,
+    theme: "TEMA 2: EXAME FÍSICO ESPECÍFICO E URGÊNCIAS FACIAIS",
+    text: [
+      "Mulher de 45 anos chega ao pronto-socorro após agressão com barra de ferro na região orbital esquerda. Queixa-se de dor orbitária excruciante, inchaço severo e refere que sua visão do lado esquerdo está \"ficando completamente escura\".",
+      "Exame físico: PA 140 x 90 mmHg, FC 95 bpm. Olho esquerdo: proptose evidente, edema palpebral tenso, hemorragia subconjuntival intensa. A pupila esquerda está fixa, dilatada (midríase não fotorreagente) e há ptose. À oftalmoscopia nota-se tensão ocular visivelmente aumentada."
+    ],
+    question: "O quadro clínico descrito caracteriza uma urgência médica aguda, e a principal hipótese diagnóstica é:",
+    options: [
+      { letter: "A", text: "hematoma retrobulbar." },
+      { letter: "B", text: "fratura do tipo blow-in de assoalho." },
+      { letter: "C", text: "fratura naso-órbito-etmoidal." },
+      { letter: "D", text: "ruptura do ligamento cantal lateral." }
+    ],
+    correctAnswer: "A",
+    justificationCorrect: "O hematoma retrobulbar clássico cursa com aumento rápido da pressão intraorbitária, levando à síndrome compartimental da órbita. Os sintomas patognomônicos incluem dor local intensa, perda progressiva da visão, pupilas fixas e dilatadas, ptose, proptose severa e hemorragia subconjuntival, o que exige cantotomia/cantólise lateral de emergência para salvar o nervo óptico da isquemia.",
+    justificationIncorrect: "(B) Incorreta. Embora uma fratura blow-in possa diminuir o volume da órbita e causar pressão, a tríade clássica de dor intensa, perda visual abrupta, pupila fixa/dilatada e proptose volumosa pós-trauma é a marca clínica do hematoma retrobulbar expansivo.\n(C) Incorreta. A fratura NOE cursa com telecanto e nariz achatado (\"nariz de boxeador\"), sem causar isoladamente a síndrome compartimental orbitária descrita.\n(D) Incorreta. A ruptura do ligamento cantal afeta o posicionamento da pálpebra (gerando telecanto, se for o medial), mas não cursa com perda de visão aguda, pupila fixa e proptose."
+  },
+  {
+    id: 8,
+    theme: "TEMA 2: EXAME FÍSICO ESPECÍFICO E URGÊNCIAS FACIAIS",
+    text: [
+      "Homem de 22 anos é admitido em UPA com corte contuso profundo na região geniana esquerda (bochecha) após acidente com vidro de janela. Sangramento moderado sob controle.",
+      "Exame físico: ferida de 4 cm de extensão na projeção do músculo masseter, no trajeto entre o trágus e o lábio superior esquerdo. Durante o exame das estruturas faciais profundas, o cirurgião observa o extravasamento de um líquido seroso e transparente pelo leito da ferida e suspeita de lesão glandular/ductal associada."
+    ],
+    question: "Qual estrutura anatômica passa pela região geniana e exige investigação rigorosa em lesões profundas nesse local?",
+    options: [
+      { letter: "A", text: "O ducto nasofrontal." },
+      { letter: "B", text: "O ligamento de Whitnall." },
+      { letter: "C", text: "O saco lacrimal." },
+      { letter: "D", text: "O ducto parotídeo (de Stensen)." }
+    ],
+    correctAnswer: "D",
+    justificationCorrect: "Durante o exame físico direcionado à região geniana (bochechas), as duas principais estruturas vitais que cursam nesse trajeto e sofrem risco em lacerações profundas são os ramos do nervo facial e o ducto parotídeo (ducto de Stensen), que transporta saliva da glândula parótida para a cavidade oral. O extravasamento de líquido seroso (saliva) confirma a suspeita.",
+    justificationIncorrect: "(A) Incorreta. O ducto nasofrontal drena o seio frontal para a fossa nasal, localizado no terço superior e paramediano da face, não na região geniana.\n(B) Incorreta. O tubérculo orbitário lateral de Whitnall fica na margem lateral da órbita (osso zigomático), relacionando-se com o ligamento cantal lateral.\n(C) Incorreta. O saco lacrimal localiza-se na região medial da órbita (fossa lacrimal), ligado à drenagem da lágrima, não tendo trajeto anatômico na região geniana (bochecha inferior/lateral)."
+  },
+  {
+    id: 9,
+    theme: "TEMA 2: EXAME FÍSICO ESPECÍFICO E URGÊNCIAS FACIAIS",
+    text: [
+      "Homem de 60 anos tropeça em um degrau e sofre trauma de face por choque direto do rosto contra o solo de concreto.",
+      "Exame físico: abertura bucal dolorosa. Dentição incompleta prévia. Ao pedir para o paciente morder (oclusão), observa-se que os dentes superiores e inferiores não se encaixam adequadamente como antes do acidente. O residente imobiliza a cabeça do paciente com uma mão e, com a outra, segura os dentes incisivos superiores, realizando movimentos anteroposteriores e verticais. Observa-se que todo o arco maxilar superior e o terço médio do esqueleto facial se movem em bloco independentemente do crânio superior."
+    ],
+    question: "A mobilidade do terço médio do esqueleto facial no exame físico indica classicamente uma:",
+    options: [
+      { letter: "A", text: "fratura do arco zigomático isolada." },
+      { letter: "B", text: "fratura do tipo Le Fort." },
+      { letter: "C", text: "fratura da sínfise mandibular." },
+      { letter: "D", text: "luxação da articulação temporomandibular." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "O teste de mobilidade maxilar (segurar a maxila anterior e testar movimento) avalia o descolamento do terço médio da face em relação à base do crânio. A mobilidade global do 1/3 médio (separação crânio-facial) é o achado clínico definidor das fraturas da classe de Le Fort (tipos II ou III, ou I se for apenas a base maxilar).",
+    justificationIncorrect: "(A) Incorreta. A fratura do arco zigomático prejudica a excursão da mandíbula (bloqueio do processo coronoide) e causa afundamento lateral, mas não deixa a maxila central e o terço médio móveis.\n(C) Incorreta. A fratura da sínfise mandibular (mento) causa alteração oclusal inferior e crepitação/dor no queixo, mas o terço médio da face (maxila superior) permanecerá rígido e fixado à base do crânio.\n(D) Incorreta. Luxação da ATM impede o fechamento da boca (boca aberta e travada) e altera a oclusão, mas a maxila (dentes superiores) não apresenta mobilidade em relação ao crânio no exame manual."
+  },
+  {
+    id: 10,
+    theme: "TEMA 2: EXAME FÍSICO ESPECÍFICO E URGÊNCIAS FACIAIS",
+    text: [
+      "Estudante de 19 anos comparece ao ambulatório após ter recebido uma pancada na região temporal direita há três dias durante um jogo de basquete. Refere que desde ontem tem saído um líquido aquoso pelo ouvido e que a audição está abafada.",
+      "Exame físico: PA 110 x 70 mmHg. Oroscopia sem alterações. À otoscopia, observa-se hemotímpano à direita. Equimose retroauricular evidente no lado direito (sinal de Battle)."
+    ],
+    question: "O líquido aquoso drenado pelo canal auditivo nesse contexto sugere o escape de:",
+    options: [
+      { letter: "A", text: "linfa por lesão do ducto torácico cervical." },
+      { letter: "B", text: "líquido cefalorraquidiano (LCR) por fratura da fossa craniana média." },
+      { letter: "C", text: "endolinfa por ruptura da janela redonda isolada." },
+      { letter: "D", text: "saliva por fístula do ducto de Stensen no conduto auditivo." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "O sinal de Battle (equimose mastóidea) associado a hemotímpano e escape de fluido claro aquoso pela orelha constitui o quadro clássico de fratura de base de crânio acometendo o osso temporal (fossa craniana média). O líquido descrito é o LCR (líquor), configurando uma otoliquorréia.",
+    justificationIncorrect: "(A) Incorreta. O ducto torácico localiza-se no tórax e pescoço baixo (base cervical esquerda) e sua lesão causa quilotórax ou fístula linfática cervical, não otorreia.\n(C) Incorreta. Ruptura de janelas labirínticas pode causar surdez neurossensorial e vertigem, mas o volume de perilinfa/endolinfa é ínfimo e não causa drenagem visível de líquido aquoso externo contínuo.\n(D) Incorreta. A glândula parótida fica anterior à orelha, e seu ducto drena internamente na boca, não para dentro do conduto auditivo."
+  },
+  {
+    id: 11,
+    theme: "TEMA 3: FRATURAS DO TERÇO SUPERIOR E FISIOPATOLOGIA",
+    text: [
+      "Homem de 26 anos é trazido ao hospital após agressão com bastão de madeira na testa.",
+      "Exame físico: extenso hematoma e depressão óssea palpável na região glabelar/supraciliar. Queixa-se de formigamento e anestesia na pele da fronte acima da sobrancelha direita."
+    ],
+    table: {
+      headers: ["Exame", "Resultado"],
+      rows: [
+        ["TC de crânio (janela óssea)", "Fratura do seio frontal envolvendo a tábua anterior e com desvio de 10 mm da tábua posterior em direção ao parênquima cerebral"]
+      ]
+    },
+    question: "A conduta adequada frente aos achados tomográficos da tábua posterior do seio frontal é a intervenção cirúrgica neurológica/craniomaxilofacial imediata, cujo principal racional é:",
+    options: [
+      { letter: "A", text: "prevenir a formação de pólipos nasais crônicos." },
+      { letter: "B", text: "corrigir a anestesia do nervo supraorbital, que é uma urgência inadiável." },
+      { letter: "C", text: "reparar presumível laceração da dura-máter e evitar meningite ascendente." },
+      { letter: "D", text: "restaurar o amortecimento de choque G da margem infraorbital." }
+    ],
+    correctAnswer: "C",
+    justificationCorrect: "As fraturas da tábua posterior do seio frontal que apresentam desvio significativo presumivelmente laceram a dura-máter (visto que a dura é intimamente aderida a essa região óssea). A intervenção cirúrgica tem indicação clássica para reparo da dura-máter, \"cranianização\" ou obliteração do seio frontal, prevenindo fístulas liquóricas crônicas, pneumoencéfalo e infecções do SNC (meningites/abcessos).",
+    justificationIncorrect: "(A) Incorreta. Pólipos nasais têm etiologia inflamatória/alérgica e não decorrem primariamente de desvio da tábua posterior do seio frontal.\n(B) Incorreta. A lesão do nervo supraorbital (causa da anestesia da fronte relatada) é um achado comum em fraturas frontais, mas a neuropraxia/axoniotmese nervosa periférica per se não é indicação de urgência cirúrgica; trata-se de forma conservadora na maioria das vezes.\n(D) Incorreta. O amortecimento biomecânico G da margem infraorbital é relacionado aos ossos da base da órbita/zigoma, e não se relaciona com o desvio da tábua craniana posterior do osso frontal."
+  },
+  {
+    id: 12,
+    theme: "TEMA 3: FRATURAS DO TERÇO SUPERIOR E FISIOPATOLOGIA",
+    text: [
+      "A biomecânica dos traumas de face varia de acordo com a resistência dos componentes ósseos. Em uma ocorrência envolvendo acidentes esportivos, o médico avalia um lutador que recebeu diversos golpes. Sabe-se que diferentes partes da face suportam diferentes intensidades de força gravitacional (impacto medido em forças G) antes de fraturar."
+    ],
+    question: "Dentre as estruturas listadas abaixo, assinale aquela que apresenta a MAIOR fragilidade biomecânica intrínseca, necessitando do impacto de mais baixa energia (aprox. 30G) para ser fraturada:",
+    options: [
+      { letter: "A", text: "Osso frontal." },
+      { letter: "B", text: "Sínfise mandibular." },
+      { letter: "C", text: "Ossos nasais." },
+      { letter: "D", text: "Margem supraorbital." }
+    ],
+    correctAnswer: "C",
+    justificationCorrect: "Os ossos nasais, devido à sua projeção anterior na face e porções corticais extremamente finas, são a estrutura mais frágil e frequentemente fraturada, requerendo uma força de impacto muito baixa (cerca de 30G) em comparação com o restante do esqueleto craniofacial, justificando ser a fratura de face mais comum.",
+    justificationIncorrect: "(A) Incorreta. O osso frontal é bastante espesso e protege o encéfalo, necessitando de alto impacto (cerca de 100G) para sua fratura.\n(B) Incorreta. A sínfise mandibular (mento) possui osso denso (basal) e exige forças de alto impacto (cerca de 100G) para quebra.\n(D) Incorreta. A margem supraorbital é uma forte barra óssea horizontal de proteção, figurando entre as partes mais resistentes, suportando até cerca de 200G antes da falha óssea."
+  },
+  {
+    id: 13,
+    theme: "TEMA 3: FRATURAS DO TERÇO SUPERIOR E FISIOPATOLOGIA",
+    text: [
+      "Homem de 45 anos, trabalhador da construção civil, sofre traumatismo craniofacial frontal ao ser atingido por um cabo rompido.",
+      "Exame físico: PA 140 x 85 mmHg, FC 88 bpm. Grande contusão e equimose frontal. Escala de coma de Glasgow 15. Realizada TC de crânio e face.",
+      "O laudo da tomografia descreve: \"Fratura isolada e com leve depressão restrita à tábua anterior do seio frontal direito. Nota-se envolvimento do recesso/ducto nasofrontal homolateral pela linha de fratura, com obstrução de sua luz.\""
+    ],
+    question: "Apesar de a tábua posterior estar intacta, a fratura envolvendo o ducto nasofrontal indica intervenção cirúrgica. O principal motivo profilático para essa abordagem é evitar a formação de:",
+    options: [
+      { letter: "A", text: "hemorragia subaracnóidea tardia." },
+      { letter: "B", text: "mucocele do seio frontal." },
+      { letter: "C", text: "deslocamento do ligamento cantal lateral." },
+      { letter: "D", text: "síndrome do ápice orbitário." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "O ducto nasofrontal drena as secreções mucosas do seio frontal para a cavidade nasal. Uma fratura que obstrui ou oblitera este ducto fará com que o muco continue a ser produzido pela mucosa sinusal, mas fique retido no interior do seio fechado. Com o tempo, isso forma uma mucocele (uma lesão cística expansiva) que pode destruir o osso circundante (inclusive a tábua posterior) e invadir a órbita ou o cérebro, razão pela qual requer tratamento cirúrgico profilático.",
+    justificationIncorrect: "(A) Incorreta. Hemorragia subaracnóidea ocorre por lesão vascular intracraniana no momento do trauma (alta energia) e não como complicação anatômica obstrutiva crônica do seio paranasal.\n(C) Incorreta. O ligamento cantal lateral fixa-se no osso zigomático (tubérculo de Whitnall), muito inferior e lateral ao ducto nasofrontal.\n(D) Incorreta. A síndrome do ápice orbitário ocorre por fraturas profundas da órbita (canal óptico, fissura orbitária superior) e não tem relação com a obstrução da drenagem do seio frontal."
+  },
+  {
+    id: 14,
+    theme: "TEMA 3: FRATURAS DO TERÇO SUPERIOR E FISIOPATOLOGIA",
+    text: [
+      "Mulher de 27 anos envolve-se em capotamento de veículo. Na UPA, apresenta laceração transversa de 6 cm cruzando a sobrancelha esquerda, estendendo-se até a porção medial da fronte.",
+      "Exame físico: dor local e sangramento ativo controlável por pressão. Ao testar a sensibilidade tátil e dolorosa da paciente com uma agulha limpa, o médico constata completa anestesia da pele de toda a região da testa ipsilateral à laceração e do couro cabeludo anterior. A mobilidade frontal (elevação de supercílios) está preservada simetricamente, comprovando a integridade do nervo facial."
+    ],
+    question: "Qual nervo foi lesionado na topografia da fratura/laceração da margem superior da órbita?",
+    options: [
+      { letter: "A", text: "Nervo oftálmico (ramo nasociliar)." },
+      { letter: "B", text: "Nervo infraorbital." },
+      { letter: "C", text: "Nervo supratroclear." },
+      { letter: "D", text: "Nervo supraorbital." }
+    ],
+    correctAnswer: "D",
+    justificationCorrect: "O nervo supraorbital (um ramo do nervo oftálmico, V1) emerge do forame supraorbital na margem superior da órbita e é responsável por toda a sensibilidade sensitiva cutânea da região frontal e do terço anterior do couro cabeludo ipsilateral. Sua lesão em fraturas do osso frontal ou lacerações supraciliares resulta na clássica anestesia da testa do mesmo lado.",
+    justificationIncorrect: "(A) Incorreta. O ramo nasociliar do nervo oftálmico emite nervos para o globo ocular e pele do dorso do nariz, não inervando a vasta extensão da fronte e couro cabeludo.\n(B) Incorreta. O nervo infraorbital (ramo do maxilar, V2) emerge abaixo da órbita e inerva a bochecha, asa do nariz, pálpebra inferior e lábio superior.\n(C) Incorreta. O nervo supratroclear inerva apenas a pequena porção medial da fronte/glabela, sendo o supraorbital o principal responsável pela inervação ascendente descrita de todo o hemisfério frontal."
+  },
+  {
+    id: 15,
+    theme: "TEMA 3: FRATURAS DO TERÇO SUPERIOR E FISIOPATOLOGIA",
+    text: [
+      "Homem de 50 anos apresenta-se em ambulatório de cirurgia maxilofacial com queixa de saída de líquido transparente e aquoso pelas duas narinas há cinco dias, iniciada após uma queda frontal de bicicleta. O líquido não melhora com descongestionantes e goteja ao abaixar a cabeça (\"sinal do gotejamento\").",
+      "Exame físico: normocorado. Exame neurológico sumário sem sinais meníngeos. Rinorréia aquosa clara e fluida, com ausência de sinais de inflamação de mucosa nasal.",
+      "A suspeita imediata é de rinorréia com Líquido Cefalorraquidiano (LCR)."
+    ],
+    question: "A fratura basilar do crânio que tipicamente acarreta esse achado acomete a:",
+    options: [
+      { letter: "A", text: "placa pterigóidea posterior e palato duro." },
+      { letter: "B", text: "placa cribriforme (teto etmoidal) e fossa craniana anterior." },
+      { letter: "C", text: "asa maior do osso esfenoide." },
+      { letter: "D", text: "porção escamosa do osso temporal." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "A placa cribriforme do osso etmoide, localizada na base anterior do crânio, constitui o \"teto\" da fossa nasal e é perfurada pelas fibras do nervo olfatório. É uma região ossea frágil intimamente aderida à dura-máter. Sua fratura frequentemente rompe o espaço subaracnóideo, permitindo o vazamento direto de LCR do cérebro para as fossas nasais (rinorréia liquórica).",
+    justificationIncorrect: "(A) Incorreta. O processo pterigóideo fratura em impactos tipo Le Fort I, II ou III, mas está localizado póstero-inferiormente à base do crânio encefálico e não gera acesso direto ao liquor cefalorraquidiano.\n(C) Incorreta. A fratura da asa maior do esfenoide geralmente localiza-se na fossa craniana média / parede lateral da órbita, e por si só não costuma drenar líquor direto para as narinas anteriores.\n(D) Incorreta. Fratura no osso temporal (fossa craniana média) é clássica causadora de fístula para o ouvido (otorréia liquórica ou hemotímpano), não tipicamente rinorréia anterior."
+  },
+  {
+    id: 16,
+    theme: "TEMA 4: FRATURAS DE ÓRBITA E NARIZ",
+    text: [
+      "Adolescente de 16 anos foi atingido diretamente no olho esquerdo por uma bola de beisebol (mecanismo de trauma fechado sobre o globo ocular).",
+      "Exame físico: globo ocular esquerdo encontra-se mais afundado em relação ao direito (enoftalmo). O paciente relata visão dupla (diplopia), que se agrava acentuadamente quando ele tenta olhar para cima. Observa-se restrição importante da motilidade ocular na elevação. Também há hipoestesia na região da bochecha e do lábio superior do lado esquerdo."
+    ],
+    question: "A hipótese diagnóstica, o mecanismo fisiopatológico e o respectivo tratamento indicado são:",
+    options: [
+      { letter: "A", text: "Fratura tipo blow-out pura; encarceramento do músculo reto inferior no defeito ósseo; tratamento cirúrgico (internação)." },
+      { letter: "B", text: "Fratura tipo blow-in; aumento da pressão intraorbitária pela intrusão do teto do seio maxilar; conduta expectante ambulatorial com corticoide." },
+      { letter: "C", text: "Fratura naso-órbito-etmoidal; desvio do ligamento cantal lateral; tratamento com fixação externa." },
+      { letter: "D", text: "Descolamento de retina agudo; elevação pressórica intraocular traumática sem lesão óssea; iridotomia a laser de emergência." }
+    ],
+    correctAnswer: "A",
+    justificationCorrect: "O impacto direto no globo fechado (bola de beisebol) aumenta a pressão retrobulbar, rompendo a porção mais frágil da órbita (assoalho orbital), configurando a fratura blow-out \"pura\" (quando se restringe à órbita interna, sem quebra do rebordo orbitário). A diplopia ao olhar para cima é o sintoma clássico de encarceramento mecânico do músculo reto inferior e/ou tecido periorbital nas bordas da fratura. A presença de encarceramento muscular em fratura de assoalho é uma indicação clássica de internação para tratamento cirúrgico de liberação e reconstrução do soalho.",
+    justificationIncorrect: "(B) Incorreta. Na blow-in ocorre invasão de osso maxilar para DENTRO da órbita, diminuindo seu volume e causando exoftalmia (e não enoftalmo, que é a retração do olho por aumento da cavidade na blow-out).\n(C) Incorreta. NOE envolve afundamento da raiz nasal e telecanto (ruptura de ligamento cantal medial, não lateral), sem relação primária com o encarceramento muscular de assoalho.\n(D) Incorreta. A hipoestesia do nervo infraorbital (bochecha/lábio) atesta a fratura óssea do assoalho orbital no trajeto do canal infraorbitário. Trata-se de problema traumático maxilofacial, não de oftalmologia isolada da retina."
+  },
+  {
+    id: 17,
+    theme: "TEMA 4: FRATURAS DE ÓRBITA E NARIZ",
+    text: [
+      "Homem de 21 anos comparece à Unidade de Pronto Atendimento após receber um soco no olho direito em via pública. Ele relata visão dupla moderada. O médico assistente solicita uma Tomografia Computadorizada (TC) de face.",
+      "No corte coronal do exame tomográfico do complexo maxilofacial, verifica-se fratura do assoalho da órbita direita, com herniação do tecido gorduroso e músculo reto inferior da órbita preenchendo o ápice do seio maxilar logo abaixo. Na incidência de Waters do RX simples associado, visualiza-se a imagem semelhante a uma gota pendente do teto do seio maxilar."
+    ],
+    question: "O sinal radiográfico clássico descrito nesse tipo de fratura recebe o nome de:",
+    options: [
+      { letter: "A", text: "sinal de Battle." },
+      { letter: "B", text: "sinal da gota (teardrop sign) ou sinal da \"porta de bombardeiro\"." },
+      { letter: "C", text: "sinal do duplo anel." },
+      { letter: "D", text: "nível hidroaéreo invertido em base sinusal." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "Em fraturas tipo blow-out do soalho orbital, a herniação de partes moles (gordura periorbital e/ou músculo reto inferior) pelo defeito ósseo para o interior do seio maxilar subjacente é radiologicamente vista na TC ou no RX (incidência de Waters) como uma cúpula ou massa arredondada pendurada no teto do seio maxilar, aspecto classicamente denominado sinal da \"gota\" (teardrop sign) ou imagem em \"porta de bombardeiro\" aberta.",
+    justificationIncorrect: "(A) Incorreta. O sinal de Battle é a equimose retroauricular (sobre o processo mastóideo), sinal clínico de fratura de fossa craniana média.\n(C) Incorreta. O sinal do duplo anel (halo) refere-se ao teste clínico de papel de filtro/gaze usado para diferenciar líquor de sangue, não sendo um achado radiográfico.\n(D) Incorreta. O nível hidroaéreo (ou líquido) baseia-se no acúmulo de sangue no fundo do seio devido a trauma, não descrevendo a hérnia de tecidos do teto, que corresponde ao sinal da gota."
+  },
+  {
+    id: 18,
+    theme: "TEMA 4: FRATURAS DE ÓRBITA E NARIZ",
+    text: [
+      "Mulher de 18 anos apresenta-se em serviço de pronto-atendimento após queda da própria altura de face ao solo há 3 horas.",
+      "Exame físico: sinais vitais estáveis. Observa-se evidente deformidade e afundamento em dorso do nariz, com edema importante e dor à palpação local, acompanhada de crepitação óssea. A paciente apresentou epistaxe moderada, que cessou espontaneamente. Foi realizada rinoscopia minuciosa, sendo descartada a presença de abaulamentos submucosos vinhosos (hematoma septal ausente). A paciente respira razoavelmente bem. Sem outras lesões craniofaciais no exame."
+    ],
+    question: "A conduta adequada a ser adotada na assistência, considerando tratar-se de trauma nasal isolado sem complicação septal, é:",
+    options: [
+      { letter: "A", text: "fixação de bloqueio maxilomandibular com fios de aço na sala de trauma para evitar deglutição de sangue da fossa posterior." },
+      { letter: "B", text: "controle de sintomas, analgesia e alta para acompanhamento e redução ambulatorial pelo especialista após redução do edema local." },
+      { letter: "C", text: "internação na unidade de terapia intensiva devido ao alto risco de desenvolvimento de choque hemorrágico tardio e aspiração." },
+      { letter: "D", text: "realizar imediatamente tamponamento nasal ântero-posterior profundo profilático com sonda de balão de Foley e gaze vaselinada." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "O caso descreve uma fratura nasal isolada, sem sangramento ativo agudo e sem hematoma septal. O tratamento das fraturas nasais puras e isoladas na emergência visa exclusão/tratamento do hematoma septal e controle de sangramento. Se estes não estão presentes (como no caso), a conduta é a alta com medicações analgésicas e encaminhamento ambulatorial (otorrino/cirurgia plástica) para redução da fratura eletivamente dentro de 7 a 14 dias (idealmente após a regressão do edema para adequada avaliação estética e funcional).",
+    justificationIncorrect: "(A) Incorreta. Bloqueio maxilomandibular é usado temporariamente para fraturas instáveis de maxila ou mandíbula (terços inferiores e médios complexos), não tendo qualquer serventia na fratura nasal (ossos próprios do nariz).\n(C) Incorreta. A fratura nasal isolada não exige internação em UTI, sendo tratada ambulatorialmente na grande maioria das vezes. O sangramento costuma ser anterior e autolimitado.\n(D) Incorreta. O tamponamento não está indicado pois a epistaxe já cessou espontaneamente e não se realiza profilaticamente."
+  },
+  {
+    id: 19,
+    theme: "TEMA 4: FRATURAS DE ÓRBITA E NARIZ",
+    text: [
+      "Homem de 29 anos chega ao serviço médico de urgência com traumatismo contuso no malar direito após ser atingido por um taco. A avaliação maxilofacial com tomografia revela fratura direta do rebordo infraorbital associada à quebra da parede do teto do seio maxilar. Fragmentos ósseos do teto do seio maxilar foram violentamente deslocados para cima, invadindo a cavidade orbitária e constringindo de forma relevante o volume orbital livre.",
+      "Exame físico oftalmológico: restrição global da movimentação extrínseca do olho direito e discreta exoftalmia. Tensão intraocular aumentada."
+    ],
+    question: "O mecanismo fisiopatológico descrito acima corresponde tipicamente a que tipo de fratura?",
+    options: [
+      { letter: "A", text: "Fratura tipo Le Fort III." },
+      { letter: "B", text: "Fratura de teto etmoidal (cribriforme)." },
+      { letter: "C", text: "Fratura tipo blow-out (explosão)." },
+      { letter: "D", text: "Fratura tipo blow-in (implosão)." }
+    ],
+    correctAnswer: "D",
+    justificationCorrect: "A fratura blow-in ocorre quando há um trauma direto e vigoroso que diminui o volume do seio maxilar ou desloca diretamente o assoalho da órbita para dentro da cavidade orbitária (intrusão óssea). Isso eleva criticamente a pressão intraorbitária, levando à compressão do globo ocular contra o teto rígido e determinando o surgimento de exoftalmia (globo empurrado para a frente) e comprometimento estrutural importante (visão e nervo).",
+    justificationIncorrect: "(A) Incorreta. A fratura Le Fort III ou disjunção craniofacial descreve a separação completa dos ossos da face em relação à base craniana (fratura através das suturas frontozigomática, maxilofrontal, zigomático e nasal), sem significar intrusão restrita e isolada do assoalho para cima (blow-in).\n(B) Incorreta. O teto etmoidal é a placa cribriforme (acima do nariz e internamente aos olhos). Sua quebra causa fístula liquórica.\n(C) Incorreta. Na blow-out, a base da órbita sofre um estilhaçamento voltado para baixo, ou seja, para o interior do seio maxilar, aumentando o volume da órbita e causando o afundamento posterior do olho (enoftalmia)."
+  },
+  {
+    id: 20,
+    theme: "TEMA 4: FRATURAS DE ÓRBITA E NARIZ",
+    text: [
+      "Um paciente de 25 anos com fratura simples e isolada do assoalho orbital direito do tipo blow-out, confirmada por TC sem encarceramento muscular evidente e sem indicação cirúrgica atual.",
+      "Avaliação do plantonista oftalmologista: ausência de déficit de acuidade visual, ausência de diplopia significativa na posição primária. Diante disso, decide-se pelo tratamento clínico conservador e alta para acompanhamento ambulatorial rigoroso."
+    ],
+    question: "Quais são as orientações e as classes de medicações pertinentes ao suporte não cirúrgico na alta deste paciente?",
+    options: [
+      { letter: "A", text: "Analgésicos apenas, sendo contraindicado o uso de antibioticoterapia para evitar resistência bacteriana na flora cutânea da face." },
+      { letter: "B", text: "Antibioticoterapia profilática, descongestionantes nasais tópicos/sistêmicos (por 3 dias) e orientação veemente para evitar assoar o nariz." },
+      { letter: "C", text: "Corticoterapia em altas doses endovenosas por 14 dias para evitar esclerose progressiva do nervo óptico." },
+      { letter: "D", text: "Imobilização com curativo compressivo rígido sobre o globo ocular por 4 semanas ininterruptas." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "As orientações clássicas para tratamento expectante de pequenas fraturas do assoalho da órbita incluem prescrição de descongestionantes (para manter o óstio sinusal permeável e promover a drenagem), antibióticos profiláticos (a fratura quebra o selamento entre o seio maxilar sujo/contaminado e a cavidade orbitária estéril, criando risco de infecção orbitária retrógrada), profilaxia antitetânica e a instrução crucial para que o paciente não assoe o nariz, para evitar a injeção forçada de ar contendo bactérias do seio em direção à órbita (enfisema orbitário).",
+    justificationIncorrect: "(A) Incorreta. Antibióticos profiláticos são indicados porque há comunicação direta de espaço estéril (órbita peribulbar) com cavidades paranasais (seios maxilares) usualmente contaminadas.\n(C) Incorreta. Altas doses intravenosas por 14 dias correspondem a pulsoterapia, indicada para neurite óptica aguda desmielinizante ou choque isquêmico do nervo óptico atestado, nunca sendo a rotina profilática padrão para uma pequena fratura blow-out conservadora.\n(D) Incorreta. A compressão do globo em uma fratura com comunicação aos seios poderia exacerbar isquemia retrobulbar latente. Não se usa curativo oclusivo compressivo rígido nas fraturas de parede orbitária."
+  },
+  {
+    id: 21,
+    theme: "TEMA 5: FRATURAS COMPLEXAS DO TERÇO MÉDIO - NOE E LE FORT",
+    text: [
+      "Homem de 44 anos chega à UPA trazido pelo SAMU. Sofreu grave impacto contuso sobre a porção superior da ponte nasal, lançado de encontro ao volante em acidente automobilístico sem cinto de segurança.",
+      "Exame físico: A porção superior central da face encontra-se com achatamento agudo e nítido alargamento entre os olhos (deformidade em \"nariz de boxeador\"). A palpação cuidadosa da área intranasal lateral provoca o movimento simultâneo visível da porção medial da pálpebra (canto do olho) do lado testado."
+    ],
+    table: {
+      headers: ["Exame (Avaliação Oftalmológica no plantão)", "Resultado"],
+      rows: [
+        ["Distância interpupilar", "Conservada / Normal"],
+        ["Distância intercantal", "Significativamente aumentada"]
+      ]
+    },
+    question: "A fratura caracterizada pela cominuição dos ossos nasais centrais com a região medial do rebordo da órbita associada aos achados descritos é a:",
+    options: [
+      { letter: "A", text: "fratura Le Fort I." },
+      { letter: "B", text: "fratura complexa Naso-órbito-etmoidal (NOE)." },
+      { letter: "C", text: "fratura isolada de parede lateral maxilar." },
+      { letter: "D", text: "disjunção do complexo zigomaticomaxilar (CZM)." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "A fratura naso-órbito-etmoidal (NOE) é produzida por uma força central violenta que afunda e esmaga o nariz conjuntamente à parte medial dos rebordos orbitários e células etmoidais subjacentes. A característica principal que define este diagnóstico clínico é o desvio lateral da porção de osso que fixa o ligamento cantal medial, gerando um alargamento irreal da distância entre os olhos (telecanto traumático sem hipertelorismo ocular verdadeiro, pois a distância entre as pupilas mantém-se normal) e deformidade em \"nariz de pugilista/boxeador\".",
+    justificationIncorrect: "(A) Incorreta. A fratura de Le Fort I acomete horizontalmente a maxila inferior, afetando os alvéolos e forames das fossas nasais baixas, deixando estáveis o nariz superior, o complexo etmoidal e a ponte nasal.\n(C) Incorreta. A fratura do pilar lateral da maxila causa dor vestibular lateral/perda de projeção geniana, e não se relaciona de modo algum com alargamento dos cantos oculares nasais.\n(D) Incorreta. A fratura zigomaticomaxilar quebra o \"pilar lateral/malar\", causando afundamento das maçãs do rosto lateralmente à órbita inferior, não afundando e achatando as estruturas mediais da região glabelar e nasal superior (telecanto)."
+  },
+  {
+    id: 22,
+    theme: "TEMA 5: FRATURAS COMPLEXAS DO TERÇO MÉDIO - NOE E LE FORT",
+    text: [
+      "Paciente de 38 anos sofreu impacto direto (trauma linear com cano de ferro) contra o lábio superior e parte inferior do nariz e da maxila em uma briga.",
+      "Exame físico: volumoso edema em lábio superior e gengivas, acompanhado de oclusão inadequada (má oclusão dentária aguda). O médico bucomaxilofacial realiza o teste clínico de estabilidade maxilar segurando a pré-maxila anterior (arcada dos incisivos superiores) e constata que, durante a manipulação da arcada superior, nota-se apenas mobilidade horizontal restrita da área dentoalveolar e palato da maxila inferior, enquanto a ponte nasal, as órbitas inferiores e os malares permanecem absolutamente fixos e inabaláveis (\"estabilidade nasal e orbitária preservadas\"). A radiografia PA na incidência de Waters revela opacificação homogênea inferior de ambos seios maxilares por sangue contido."
+    ],
+    question: "O diagnóstico de fratura transversal e horizontal da maxila, de acordo com as diretrizes e regras de Rene Le Fort aplicadas ao achado clínico, é de fratura:",
+    options: [
+      { letter: "A", text: "do arco zigomático ipsilateral isolado." },
+      { letter: "B", text: "Le Fort II." },
+      { letter: "C", text: "Le Fort III." },
+      { letter: "D", text: "Le Fort I." }
+    ],
+    correctAnswer: "D",
+    justificationCorrect: "A fratura descrita é a clássica Le Fort I de traço horizontal inferior. A separação ocorre no plano dos assoalhos dos seios maxilares acima das raízes dentárias em toda a extensão do palato/processo alveolar de uma incisura pterigomaxilar à outra. O achado clínico patognomônico e definidor do padrão Le Fort I no exame físico manual é que a manipulação do osso da arcada superior movimenta os dentes como se fossem a \"chapa móvel\" ou \"dentadura livre\", mas o osso nasal, malares e assoalho orbitário não apresentam o menor grau de mobilidade porque a ruptura óssea passa horizontalmente bem abaixo deles.",
+    justificationIncorrect: "(A) Incorreta. Afeta o contorno ósseo lateral temporal da bochecha, sem afetar o centro da mordida nem conferir mobilidade em bloco ao palato dentário.\n(B) Incorreta. A Le Fort II (piramidal) cursa com fratura ascendente pelas laterais e alcança a junção nasofrontal (ponte superior). Na palpação da maxila, o examinador sente todo o nariz externo (pirâmide central) mover-se simultaneamente aos dentes em bloco.\n(C) Incorreta. A Le Fort III disjunge toda a base do crânio. O teste de estabilidade maxilar exibe toda a face inteira balançando como um capacete desconectado, com quebra dos pilares lateral orbitários, frontomalares, nasofrontais."
+  },
+  {
+    id: 23,
+    theme: "TEMA 5: FRATURAS COMPLEXAS DO TERÇO MÉDIO - NOE E LE FORT",
+    text: [
+      "Para manter a estrutura facial perfeitamente alinhada e suportar os formidáveis estresses do impacto craniano e mastigação, o esqueleto craniofacial humano está estruturado e dividido fisiopatologicamente em grossos \"pilares\" espessos de transmissão e distribuição das forças biológicas. Na falência biomecânica e desabamento da face perante o trauma grave, esses suportes são sistematicamente quebrados de forma previsível e devem ser cirurgicamente reconstruídos."
+    ],
+    question: "As barras de traço vertical ósseas espessas de proteção e suportes oclusais contra forças direcionadas mastigatórias de impacto no terço médio e terço posterior são denominadas:",
+    options: [
+      { letter: "A", text: "rebordo infraorbital superior, palato duro mediano e barra alveolar inferior." },
+      { letter: "B", text: "pilar naso-maxilar (medial), pilar zigomatico-maxilar (lateral) e pilar ptérigo-maxilar (posterior)." },
+      { letter: "C", text: "arco zigomático lateral anterior, canal nasolacrimal medial e corpo esfenoide." },
+      { letter: "D", text: "mandíbula anterior (corpo/sínfise), ramo posterior da mandíbula e septo cartilaginoso vomeriano." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "Em cirurgia e trauma craniomaxilofacial, o sistema estrutural vertical do arcabouço craniocervical divide-se exatamente na arquitetura das três vigorosas barras do esqueleto e suporte paranasal vertical maxilar que são primariamente impactadas no traumatismo facial complexo e devem alinhar estritamente os vetores mastigatórios (dentes a maxila e crânio base). Elas são os pilares: pilar Nasomaxilar (canino, medial do nariz), pilar Zigomático-maxilar (lateral forte, osso malar) e o sustentáculo de retroescora maxilar final do osso esfenóide que é o pilar Ptérigo-maxilar (pilar posterior).",
+    justificationIncorrect: "(A) Incorreta. Rebordo infraorbital compõe o pilar ou a viga transversa horizontal, não servindo como base estrutural de amortecimento primário mecânico para distribuição axial vertical de força.\n(C) Incorreta. Arco zigomático é clássico suporte de sustentação estrutural antero-posterior transversal lateral (um pilar horizontal fino), não integrando o rol de contrafortes verticais frontais primários.\n(D) Incorreta. Ramo mandibular, sínfise e septo etmoidal-vômer fazem parte das vias mandibulofaciais do osso móvel e sustentáculo nasocartilaginoso mole e móvel; não representam pilares do sistema biológico rígido vertical protetivo craniano maxilar (\"buttresses\")."
+  },
+  {
+    id: 24,
+    theme: "TEMA 5: FRATURAS COMPLEXAS DO TERÇO MÉDIO - NOE E LE FORT",
+    text: [
+      "Jovem do sexo masculino, de 19 anos de idade, envolvido em colisão com a parede por pilotar jet ski sem proteção, comparece ao pronto socorro apresentando enorme alargamento irreal da pirâmide nasal (distância e base central larga), abaulamento, com telecanto traumático aparente de forma muito nítida no canto interno do olho direito após fratura severa dos ossos NOE. A córnea ocular ipsilateral não exibe anormalidades ou dilatação pupilar.",
+      "O paciente pergunta aflito a respeito dessa sua repentina perda de alinhamento nas margens da pele próxima ao canal lacrimal e a frouxidão do olho no rebordo medial sem quebra orbital visível local direta."
+    ],
+    question: "Do ponto de vista anátomo-clínico, o \"telecanto traumático\" patognomônico deste impacto está diretamente enraizado na lesão e esmagamento por distanciamento e falha estrutural primária de qual estabilizador orbitofacial?",
+    options: [
+      { letter: "A", text: "Porção tendínea lateral do músculo reto lateral contra a sutura frontoesfenoidal." },
+      { letter: "B", text: "Ligamento de inserção cantal medial (frequentemente estirado a nível do osso lacrimal/maxila no ápice da abertura nasal piriforme rompida)." },
+      { letter: "C", text: "Porção aponeurótica orbitária profunda de união das fibras interconectoras do músculo oblíquo inferior do reto ipsilateral." },
+      { letter: "D", text: "Ligamento aponeurótico de Whitnall e retentores capsulopalpebrais laterais (na órbita temporal periférica)." }
+    ],
+    correctAnswer: "B",
+    justificationCorrect: "O ligamento cantal medial é a forte e robusta estrutura fibrosa bifurcada fixadora central anatômica que ancora toda a tensão palpebral e de proteção ao canto interno do olho humano na crista e saco lacrimal anterior/posterior de inserção firme na placa do osso maxilar e nasal óssea base. Quando a pirâmide óssea medial da base nasal etmoidal cede e é estilhaçada/cominuída de modo espalhado sob o severo impacto axial (fratura traumática NOE), arrasta-se e desliga-se violentamente de tração óssea esse fulcro ligamentar, provocando assim a assimetria característica plástica de encurtamento palpebral, achatamento visual da ponte intercanthal e arredondamento patológico (\"telecanto traumático sem aumento da distância interpupilar biocular primária\").",
+    justificationIncorrect: "(A) Incorreta. Reto lateral estabiliza rotação de base do globo e afixado via anel de Zinn intraconal do fundo ocular esfenoidal interno e seu impacto direto ou encarceramento (isolado grave ou esmagamento na ponta do forame orbitário posterior/síndrome fissura orbital) e não geraria esse tipo isolado estético posicional externo cantal cutâneo frouxo medial.\n(C) Incorreta. Oblíquo inferior interage nas paredes internas de movimentação motriz da subestrutura orbitária (estrabismo e paralisia), não exercendo esse controle puramente externo superficial horizontal tendíneo na fenda de largura medial lacrimal visível do telecanto.\n(D) Incorreta. Ligamento cantal LATERAL (composto ou interconectado no retentor Whitnall ósseo de ancoragem temporal orbitária e tubérculo de osso zigomático malar marginal) regulariza estabilidade estática e afundamentos temporais externos oblíquos cantais \"em fenda caindo para baixo e externa\", ocorrentes por trauma zigomático, não justificando a patologia típica etmoidal interna descrita de abertura interdistância ocular superior lacrimal típica \"boxeador nasal NOE\"."
+  },
+  {
+    id: 25,
+    theme: "TEMA 5: FRATURAS COMPLEXAS DO TERÇO MÉDIO - NOE E LE FORT",
+    text: [
+      "Homem de 22 anos foi golpeado violentamente em face por bloco denso frontal de concreto contuso aéreo numa manifestação de torcidas desportivas.",
+      "Exame físico emergencial na unidade primária secundária (UPA): sangramento ativo em via oral posterior volumoso e lacerações cortocontusas submandibulares evidentes. A avaliação de teste em bloco da fratura facial na estrutura e contorno piramidal em triângulo medial, que alcançou traço por ambas arcadas palatinas inferiores de rebordo alveolar maxilar até a junção na estrutura de ossos próprios mediais do nariz acima. Quando o residente firma ativamente e traciona o bloco de palato dentário com uma mão (incisivos superiores) simultaneamente sentindo e estabilizando a ponte base nasal de testa por sobreposição de pele com outra, sente que APENAS TODO esse centro (Nariz, parede de órbita nasal lacrimal mediana e dentes, sem envolver malar ou orbita lateral/zigoma em bloco externo) movimenta-se solto balançando para baixo e para os lados simultaneamente e desencaixado de osso crânio da base com intensa rinorréia e sangramento de epistaxe fluída e edema em toda órbita orbitária interna em formato claro de fratura de base nasal e medial, porém as barras temporais rígidas zigomáticas seguem imóveis absolutas não tracionando."
+    ],
+    question: "A linha clássica descrita nas zonas de fraqueza no padrão radiográfico ou sintomatológico palpatório de instabilidade manual (nariz superior em sutura de quebra + boca central) denota:",
+    options: [
+      { letter: "A", text: "Classificação cirúrgica disjuntiva total craniofacial do tipo Le Fort III." },
+      { letter: "B", text: "Afastamento maxilar segmentar isolado dento-alveolar clássico Le Fort I (dentadura plana móvel pura sem traço ou crepitação nasal ascendente)." },
+      { letter: "C", text: "Deformidade clássica fraturada óssea e contusional isolada do Tipo Afundamento Nasal sem desvios focais." },
+      { letter: "D", text: "O padrão de cominuição fraturária clássica estrutural Le Fort II (Fratura em pirâmide maxilonasal)." }
+    ],
+    correctAnswer: "D",
+    justificationCorrect: "O achado definidor clínico ao teste manual no exame primário de toque diagnóstico patognomônico para disjunção mediana de formato e fratura Le Fort II (que é a clássica \"Fratura na base tipo Piramidal\"), consiste fundamentalmente no arrastamento frouxo do plano oclusivo e gengival de rebordo dente maxilar sendo movido CONJUNTAMENTE acoplado a raiz central de sutura frontonasal média medial e infraorbitária interna associada ao complexo do esqueleto osso-nasal central no espaço que é fraturado, em nítido contraste fixo absoluto aos fortes e imóveis bordos de arco base malar e orbitais laterais espessos de cantos da calota óssea do craniana temporal externa perfeitamente saudáveis. Esta manobra evidencia classicamente mobilidade do dente e do osso nasal central piramidal de forma contígua em triângulo móvel perante o crânio (Le Fort II = fratura das paredes internas nasomaxilares laterais base a rebordo orbitário frontal em formato A) ou pirâmide com edema central significativo.",
+    justificationIncorrect: "(A) Incorreta. Disjunção de tipo grau máxima e alta de fraturamento padrão severo do traço biomecânico Le Fort III separaria da base a sutura de ambos rebordos cantais inteiros das asas maiores laterais zigomáticos, fazendo e balançando como máscara toda base ocular da pálpebra em afundamento disjuntivo e temporal solto. A questão enfatiza claramente o exame provando cantos de órbitas zigomáticas fixos íntegros de sustentação sem flutuação ao exame maxilar do residente (o que exime fratura do tipo III por falha dessa disjunção de extensão ao malar).\n(B) Incorreta. Le Fort I consiste e limita o seu plano de base ao \"bigode\" trans-maxilar inferior simples horizontal (dentadura livre ou fratura no tipo plataforma em arco alveolar puro baixo). Não rompe nasions nem se espalha para cima do nariz causando pirâmide ou a sintomatologia flácida associada do traço móvel ascencional até o globo do etmoide.\n(C) Incorreta. Um padrão restrito isolado simples e puramente de nariz sem desvio de focos de articulação ou sem acometimento grave com fragmentação transversal extensa alveolar inferior de dentes base que pudesse fazer e deixar totalmente separada e móvel para baixo toda placa palatal bucal e incisivos superiores com a qual o examinador e médico balançou os ossos superiores bucais (A placa de boca solta oclusa caracteriza, por definição, forte nível base do tipo complexo padrão fraturas centrais maxilares contíguas disjuntivas descritas pelo cirurgião Rene Le Fort, e não lesões e pequenas crepitações de osso nasal local solto per se)."
+  }
+];
+
+export default function App() {
+  const [answers, setAnswers] = useState({});
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showExplanation, setShowExplanation] = useState({});
+
+  const handleSelectOption = (questionId, letter) => {
+    if (answers[questionId]) return; // impede de trocar depois de responder
+    setAnswers(prev => ({ ...prev, [questionId]: letter }));
+    setShowExplanation(prev => ({ ...prev, [questionId]: true }));
+  };
+
+  const getScore = () => {
+    let score = 0;
+    Object.keys(answers).forEach(qId => {
+      const q = questionsData.find(q => q.id === parseInt(qId));
+      if (q && answers[qId] === q.correctAnswer) score++;
+    });
+    return score;
+  };
+
+  const question = questionsData[currentQuestionIndex];
+  const isAnswered = !!answers[question.id];
+  const selectedAnswer = answers[question.id];
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
+      {/* Header */}
+      <header className="bg-blue-900 text-white shadow-md sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-8 h-8 text-blue-300" />
+            <div>
+              <h1 className="text-xl font-bold leading-tight">Simulado ENAMED</h1>
+              <p className="text-blue-200 text-sm">Traumas Faciais</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 bg-blue-800 px-4 py-2 rounded-lg border border-blue-700">
+            <div className="flex flex-col items-center">
+              <span className="text-xs text-blue-300 uppercase font-bold tracking-wider">Respondidas</span>
+              <span className="font-bold text-lg">{Object.keys(answers).length} / {questionsData.length}</span>
+            </div>
+            <div className="w-px h-8 bg-blue-700"></div>
+            <div className="flex flex-col items-center">
+              <span className="text-xs text-blue-300 uppercase font-bold tracking-wider">Acertos</span>
+              <span className="font-bold text-lg text-green-400 flex items-center gap-1">
+                {getScore()} <Award className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto p-4 mt-6">
+        {/* Navigation & Progress bar */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-slate-500">Progresso do Simulado</span>
+            <span className="text-sm font-bold text-blue-600">{Math.round((Object.keys(answers).length / questionsData.length) * 100)}%</span>
+          </div>
+          <div className="w-full bg-slate-200 rounded-full h-2.5">
+            <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style={{ width: `${(Object.keys(answers).length / questionsData.length) * 100}%` }}></div>
+          </div>
+        </div>
+
+        {/* Question Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-slate-100 px-6 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+              Questão {question.id}
+            </span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">
+              {question.theme}
+            </span>
+          </div>
+
+          <div className="p-6 md:p-8">
+            <div className="prose prose-slate max-w-none">
+              {/* Question Text */}
+              {question.text.map((paragraph, index) => (
+                <p key={index} className="mb-4 text-slate-700 leading-relaxed text-[16px]">
+                  {paragraph}
+                </p>
+              ))}
+
+              {/* Table rendering if exists */}
+              {question.table && (
+                <div className="overflow-x-auto my-6 rounded-lg border border-slate-200">
+                  <table className="min-w-full text-sm text-left">
+                    <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                      <tr>
+                        {question.table.headers.map((header, i) => (
+                          <th key={i} className="px-4 py-3">{header}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {question.table.rows.map((row, i) => (
+                        <tr key={i} className="hover:bg-slate-50/50">
+                          {row.map((cell, j) => (
+                            <td key={j} className="px-4 py-3 text-slate-600">{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Question Pivot */}
+              <p className="font-bold text-slate-900 mt-6 mb-6 text-[17px]">
+                {question.question}
+              </p>
+            </div>
+
+            {/* Options */}
+            <div className="space-y-3 mt-4">
+              {question.options.map((option) => {
+                const isSelected = selectedAnswer === option.letter;
+                const isCorrect = question.correctAnswer === option.letter;
+                
+                let optionClasses = "relative flex items-start p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ";
+                
+                if (!isAnswered) {
+                  optionClasses += "border-slate-200 hover:border-blue-400 hover:bg-blue-50";
+                } else {
+                  if (isCorrect) {
+                    optionClasses += "border-green-500 bg-green-50/50";
+                  } else if (isSelected && !isCorrect) {
+                    optionClasses += "border-red-400 bg-red-50/50";
+                  } else {
+                    optionClasses += "border-slate-200 opacity-50 cursor-not-allowed";
+                  }
+                }
+
+                return (
+                  <div 
+                    key={option.letter}
+                    className={optionClasses}
+                    onClick={() => handleSelectOption(question.id, option.letter)}
+                  >
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-4 ${
+                      isAnswered 
+                        ? (isCorrect ? 'bg-green-500 text-white' : (isSelected ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-500'))
+                        : 'bg-slate-100 text-slate-600 border border-slate-300'
+                    }`}>
+                      {option.letter}
+                    </div>
+                    <div className="flex-1 mt-1 text-slate-700 leading-snug">
+                      {option.text}
+                    </div>
+                    {isAnswered && isCorrect && (
+                      <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-green-500" />
+                    )}
+                    {isAnswered && isSelected && !isCorrect && (
+                      <XCircle className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-red-500" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Explanations (Gabarito e Justificativas) */}
+            {showExplanation[question.id] && (
+              <div className="mt-8 p-6 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h3 className="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200">
+                  <AlertCircle className="w-5 h-5 text-blue-600" />
+                  Gabarito e Justificativa
+                </h3>
+                
+                <div className="mb-6">
+                  <span className="inline-block px-3 py-1 bg-green-100 text-green-800 font-bold rounded-md mb-3">
+                    Alternativa Correta: {question.correctAnswer}
+                  </span>
+                  <p className="text-slate-700 leading-relaxed">
+                    {question.justificationCorrect}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-slate-800 mb-2">Por que as outras estão incorretas?</h4>
+                  <div className="space-y-3">
+                    {question.justificationIncorrect.split('\n').map((line, idx) => (
+                      <p key={idx} className="text-slate-600 text-sm leading-relaxed p-3 bg-white rounded border border-slate-100">
+                        <span className="font-bold text-red-500 mr-1">{line.substring(0, 3)}</span>
+                        {line.substring(3)}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Navigation */}
+        <div className="mt-6 flex justify-between items-center">
+          <button
+            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+            disabled={currentQuestionIndex === 0}
+            className="px-6 py-3 rounded-lg font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Questão Anterior
+          </button>
+          
+          <button
+            onClick={() => setCurrentQuestionIndex(prev => Math.min(questionsData.length - 1, prev + 1))}
+            disabled={currentQuestionIndex === questionsData.length - 1}
+            className="px-6 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-sm"
+          >
+            Próxima Questão <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+}
